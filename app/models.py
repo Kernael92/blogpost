@@ -63,3 +63,42 @@ class File(db.Document):
 class Image(db.Document):
     name = db.StringField(max_length=20)
     image = db.ImageField(thumbnail_size=(100, 100, True))
+
+
+# Customize admin views
+class UserView(ModelView):
+    column_filters = ['name']
+
+    column_searchable_list = ('name', 'password')
+
+    form_ajax_refs = {
+        'tags': {
+            'fields': ('name')
+        }
+    }
+
+
+class PostView(ModelView):
+    column_filters = ['name']
+
+    form_ajax_refs =  {
+        'user': {
+            'fields': ['name']
+        }
+    }
+
+    form_subdocuments = {
+        'inner': {
+            'form_subdocuments': {
+                None: {
+                    # Add <hr> at the of the form 
+                    'form_rules': ('name', 'tag', 'value', rules.HTML('<hr>')),
+                    'form_widget_args': {
+                        'name': {
+                            'style': 'color: red'
+                        }
+                    }
+                }
+            }
+        }
+    }
