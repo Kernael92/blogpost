@@ -19,3 +19,47 @@ app.config['MONGODB_SETTINGS'] ={'DB': 'testing'}
 # create models
 db = MongoEngine()
 db.init_app(app)
+
+# Define mongoengine documents
+class User(db.Document):
+    name = db.StringField(max_length=40)
+    tags = db.ListField(db.ReferenceField('Tag'))
+    password = db.StringField(max_length=40)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Tag(db.Document):
+    name = db.StringField(max_length=10)
+
+    def __unicode__(self):
+        return self.name 
+
+
+class comment(db.EmbeddeDocument):
+    name = db.StringField(max_length=20, required=True)
+    value = db.StringField(max_length=20)
+    tag = db.ReferenceField(Tag)
+
+class Post(db.Document):
+    name = db.StringField(max_length=20, required=True)
+    body = db.TextAreaField()
+    pub_date = db.DateTime(default=datetime.datetime.now)
+    inner = db.ListField(db.EmbeddedDocumentField(Comment))
+    lols = db.ListField(db.StringField(max_length=20))
+    user = db.ReferenceField(User, required=True)
+
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.name
+
+
+class File(db.Document):
+    name = db.StringField(max_length=20)
+    data = db.FileField()
+
+
+class Image(db.Document):
+    name = db.StringField(max_length=20)
+    image = db.ImageField(thumbnail_size=(100, 100, True))
